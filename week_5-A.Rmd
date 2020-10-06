@@ -13,6 +13,15 @@ library(tidyverse)
 
 **Prompt:** Create a graphic of the posterior distribution of the [538 forecast](https://projects.fivethirtyeight.com/2020-election-forecast/) for Biden's electoral vote total. Recall the example given in Chapter 3 of *The Primer*.
 
+```{r sc1}
+data <- read.csv("data_538/election-forecasts-2020/presidential_ev_probabilities_2020.csv") 
+
+data %>%
+  ggplot(aes(x = total_ev, y = evprob_chal)) + 
+    geom_col() +
+    geom_vline(xintercept = 270, color = "blue", linetype = "dashed")
+
+```
 
 
 ### Scene 2
@@ -26,22 +35,44 @@ b) Assume that Biden implements the campaign, create the actual Preceptor Table 
 c) What does the actual Preceptor Table look like now?
 
 
-
-
 ### Scene 3
 
 **Prompt:** Probability distributions are confusing. Using 538's posterior probability distribution of Biden's electoral votes, answer the following question. (Recall that there are 538 total electoral votes. For this exercise, you may assume that every EV goes to either Biden or Trump. In other words, we are, by assumption, eliminating the possibility of a third party candidate winning any votes.)
 
-
 a) What is the probability that Biden wins more than 300 electoral votes?
+
+```{r sc3a}
+data %>%
+  filter(total_ev > 300) %>%
+  summarize(prob_biden = sum(evprob_chal)) %>%
+  pull(prob_biden)
+```
 
 b) What is the probability that Biden wins exactly 531 electoral votes? Is this answer consistent with your answer in a)?
 
+```{r sc3b}
+data %>%
+  filter(total_ev == 531) %>%
+  summarize(prob_biden = sum(evprob_chal)) %>%
+  pull(prob_biden)
+```
+
 c) What is the probability of a "very close" election, defined as Biden winning between 269 and 289 electoral votes, inclusive?
+
+```{r sc3c}
+data %>%
+  filter(total_ev >= 269 & total_ev <= 289 ) %>%
+  summarize(prob_biden = sum(evprob_chal)) %>%
+  pull(prob_biden)
+```
 
 d) How many unique electoral vote totals does 538 view as impossible for Biden to achieve? Some of these are truly impossible. Given an example of one of these. Why does 538 think that some vote totals, while theoretically possible, should be given zero probability in its posterior?
 
-
+```{r sc3d}
+data %>%
+  filter(evprob_chal == 0) %>%
+  select(total_ev)
+```
 
 
 ### Scene 4
